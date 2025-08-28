@@ -235,6 +235,7 @@ export const Revendas: React.FC = () => {
           <Table>
             <TableHeader>
               <TableHeaderCell>Revenda</TableHeaderCell>
+              <TableHeaderCell>Servidor</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Recursos</TableHeaderCell>
               <TableHeaderCell>Data Cadastro</TableHeaderCell>
@@ -253,6 +254,17 @@ export const Revendas: React.FC = () => {
                         <div className="font-medium text-gray-900">{revenda.nome}</div>
                         <div className="text-sm text-gray-500">{revenda.email}</div>
                         <div className="text-xs text-gray-400">ID: {revenda.id}</div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm">
+                      <div className="font-medium text-gray-900">
+                        {/* Aqui você pode adicionar o nome do servidor quando disponível */}
+                        Servidor Principal
+                      </div>
+                      <div className="text-gray-500 text-xs">
+                        Wowza Engine
                       </div>
                     </div>
                   </TableCell>

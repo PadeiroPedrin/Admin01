@@ -7,8 +7,10 @@ import { Select } from '../components/Select';
 import { useNotification } from '../contexts/NotificationContext';
 import { revendaService } from '../services/revendaService';
 import { planService } from '../services/planService';
+import { serverService } from '../services/serverService';
 import { RevendaFormData } from '../types/revenda';
 import { RevendaPlan } from '../types/plan';
+import { WowzaServer } from '../types/server';
 import { ArrowLeft, Save, User, Settings, Database, Calendar } from 'lucide-react';
 
 export const RevendaForm: React.FC = () => {
@@ -17,6 +19,8 @@ export const RevendaForm: React.FC = () => {
   const { addNotification } = useNotification();
   const [loading, setLoading] = useState(false);
   const [plans, setPlans] = useState<RevendaPlan[]>([]);
+  const [servers, setServers] = useState<WowzaServer[]>([]);
+  const [defaultServer, setDefaultServer] = useState<number | null>(null);
   const [formData, setFormData] = useState<RevendaFormData>({
     nome: '',
     usuario: '',
@@ -37,11 +41,14 @@ export const RevendaForm: React.FC = () => {
     bitrate_maximo: 5000,
     dominio_padrao: 'https://streaming.exemplo.com',
     idioma_painel: 'pt-br',
-    url_suporte: ''
+    url_suporte: '',
+    codigo_wowza_servidor: undefined
   });
 
   useEffect(() => {
     loadPlans();
+    loadServers();
+    loadDefaultServer();
     if (id) {
       loadRevenda();
     }
@@ -57,6 +64,39 @@ export const RevendaForm: React.FC = () => {
     }
   };
   const loadRevenda = async () => {
+  const loadServers = async () => {
+    try {
+      const data = await serverService.getServers(1, 1000);
+      setServers(data.servers.filter(s => s.status === 'ativo'));
+    } catch (error) {
+      console.error('Erro ao carregar servidores:', error);
+      setServers([]);
+    }
+  };
+
+  const loadDefaultServer = async () => {
+    try {
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch('/Admin/api/config', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const config = await response.json();
+        setDefaultServer(config.codigo_wowza_servidor_atual);
+        if (!id) {
+          setFormData(prev => ({
+            ...prev,
+            codigo_wowza_servidor: config.codigo_wowza_servidor_atual
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar servidor padrão:', error);
+    }
+  };
     try {
       setLoading(true);
       const revenda = await revendaService.getRevenda(Number(id));
@@ -80,7 +120,8 @@ export const RevendaForm: React.FC = () => {
         bitrate_maximo: revenda.bitrate_maximo,
         dominio_padrao: revenda.dominio_padrao,
         idioma_painel: revenda.idioma_painel,
-        url_suporte: revenda.url_suporte || ''
+        url_suporte: revenda.url_suporte || '',
+        codigo_wowza_servidor: revenda.codigo_wowza_servidor
       });
     } catch (error: any) {
       addNotification({
@@ -140,7 +181,7 @@ export const RevendaForm: React.FC = () => {
     } else if (type === 'number') {
       setFormData(prev => ({
         ...prev,
-        [name]: Number(value)
+        [name]: value === '' ? undefined : Number(value)
       }));
     } else {
       setFormData(prev => ({
@@ -162,6 +203,14 @@ export const RevendaForm: React.FC = () => {
         espaco: plan.espaco_ftp,
         subrevendas: plan.subrevendas
       }));
+      
+      // Manter o servidor selecionado
+      if (!formData.codigo_wowza_servidor && defaultServer) {
+        setFormData(prev => ({
+          ...prev,
+          codigo_wowza_servidor: defaultServer
+        }));
+      }
     } else {
       setFormData(prev => ({
         ...prev,
@@ -253,6 +302,30 @@ export const RevendaForm: React.FC = () => {
               onChange={handleChange}
               required={!id}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Servidor Wowza *
+            </label>
+            <select
+              name="codigo_wowza_servidor"
+              value={formData.codigo_wowza_servidor?.toString() || ''}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              required
+            >
+              <option value="">Selecione um servidor</option>
+              {servers.map(server => (
+                <option key={server.codigo} value={server.codigo}>
+                  {server.nome} ({server.ip})
+                  {server.codigo === defaultServer && ' - Padrão'}
+                </option>
+              ))}
+            </select>
+            <p className="text-sm text-gray-500 mt-1">
+              Servidor onde a revenda será configurada
+            </p>
           </div>
         </Card>
 

@@ -68,6 +68,7 @@ export interface RevendaFormData {
   dominio_padrao: string;
   idioma_painel: string;
   url_suporte?: string;
+  codigo_wowza_servidor?: number;
 }
 
 export interface RevendaUsage {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { useNotification } from '../contexts/NotificationContext';
 import { revendaService } from '../services/revendaService';
-import { Users, Activity, Server, TrendingUp, UserPlus, UserX, Clock, Database } from 'lucide-react';
+import { Users, Activity, Server, TrendingUp, UserPlus, UserX, Clock, Database, BarChart3, Zap, Globe } from 'lucide-react';
 
 interface DashboardStats {
   totalRevendas: number;
@@ -63,14 +63,40 @@ export const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+      <div className="space-y-8">
+        {/* Header with Logo */}
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
+                <img 
+                  src="./logo.png" 
+                  alt="Logo" 
+                  className="h-16 w-auto drop-shadow-xl"
+                />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold mb-2">Dashboard Administrativo</h1>
+                <p className="text-blue-100 text-lg">Visão geral do sistema SamCast</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center space-x-2 text-blue-100 mb-2">
+                <Clock size={16} />
+                <span className="text-sm">Última atualização: {new Date().toLocaleTimeString('pt-BR')}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+                <span className="text-sm font-medium">Sistema Online</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="animate-pulse">
-              <div className="h-20 bg-gray-200 rounded"></div>
+            <Card key={i} className="animate-pulse h-32">
+              <div className="h-full bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl"></div>
             </Card>
           ))}
         </div>
@@ -79,17 +105,38 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
-          <Clock size={16} />
-          <span>Última atualização: {new Date().toLocaleTimeString('pt-BR')}</span>
+    <div className="space-y-8">
+      {/* Header with Logo */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-3xl p-8 text-white shadow-2xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-6">
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
+              <img 
+                src="./logo.png" 
+                alt="Logo" 
+                className="h-16 w-auto drop-shadow-xl"
+              />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Dashboard Administrativo</h1>
+              <p className="text-blue-100 text-lg">Visão geral do sistema SamCast</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="flex items-center space-x-2 text-blue-100 mb-2">
+              <Clock size={16} />
+              <span className="text-sm">Última atualização: {new Date().toLocaleTimeString('pt-BR')}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+              <span className="text-sm font-medium">Sistema Online</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <Card className="bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 text-white border-0 hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
@@ -140,12 +187,12 @@ export const Dashboard: React.FC = () => {
       </div>
 
       {/* Additional Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900">Recursos Utilizados</h3>
-            <div className="p-3 bg-blue-50 rounded-xl">
-              <Database className="text-blue-600" size={24} />
+            <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl shadow-lg">
+              <BarChart3 className="text-blue-600" size={28} />
             </div>
           </div>
           <div className="space-y-5">
@@ -171,8 +218,8 @@ export const Dashboard: React.FC = () => {
         <Card>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900">Status dos Serviços</h3>
-            <div className="p-3 bg-green-50 rounded-xl">
-              <TrendingUp className="text-green-600" size={24} />
+            <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl shadow-lg">
+              <Globe className="text-green-600" size={28} />
             </div>
           </div>
           <div className="space-y-5">
@@ -211,48 +258,53 @@ export const Dashboard: React.FC = () => {
       {/* Quick Actions */}
       <Card>
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-900">Ações Rápidas</h3>
+          <div className="flex items-center space-x-3">
+            <div className="p-3 bg-gradient-to-br from-purple-50 to-pink-100 rounded-xl shadow-lg">
+              <Zap className="text-purple-600" size={24} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900">Ações Rápidas</h3>
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <button 
             onClick={() => navigate('/revendas/nova')}
-            className="p-4 sm:p-6 text-left border-2 border-gray-200 rounded-2xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:border-blue-300 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+            className="p-6 text-left border-2 border-gray-200 rounded-3xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:border-blue-300 transition-all duration-300 transform hover:scale-105 hover:shadow-xl group"
           >
             <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-xl text-white shadow-lg">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-2xl text-white shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                 <UserPlus className="text-white" size={24} />
               </div>
               <div>
                 <p className="font-bold text-gray-900">Nova Revenda</p>
-                <p className="text-xs sm:text-sm text-gray-600 mt-1">Criar nova conta de revenda</p>
+                <p className="text-sm text-gray-600 mt-1">Criar nova conta de revenda</p>
               </div>
             </div>
           </button>
           <button 
             onClick={() => navigate('/servidores')}
-            className="p-4 sm:p-6 text-left border-2 border-gray-200 rounded-2xl hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:border-green-300 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+            className="p-6 text-left border-2 border-gray-200 rounded-3xl hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:border-green-300 transition-all duration-300 transform hover:scale-105 hover:shadow-xl group"
           >
             <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-3 rounded-xl text-white shadow-lg">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-4 rounded-2xl text-white shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                 <Server className="text-white" size={24} />
               </div>
               <div>
                 <p className="font-bold text-gray-900">Gerenciar Servidores</p>
-                <p className="text-xs sm:text-sm text-gray-600 mt-1">Configurar servidores de streaming</p>
+                <p className="text-sm text-gray-600 mt-1">Configurar servidores de streaming</p>
               </div>
             </div>
           </button>
           <button 
             onClick={() => navigate('/streamings/nova')}
-            className="p-4 sm:p-6 text-left border-2 border-gray-200 rounded-2xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:border-purple-300 transition-all duration-300 transform hover:scale-105 hover:shadow-lg sm:col-span-2 lg:col-span-1"
+            className="p-6 text-left border-2 border-gray-200 rounded-3xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:border-purple-300 transition-all duration-300 transform hover:scale-105 hover:shadow-xl group sm:col-span-2 lg:col-span-1"
           >
             <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-600 p-3 rounded-xl text-white shadow-lg">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-600 p-4 rounded-2xl text-white shadow-lg group-hover:shadow-xl transition-shadow duration-300">
                 <Activity className="text-white" size={24} />
               </div>
               <div>
                 <p className="font-bold text-gray-900">Nova Streaming</p>
-                <p className="text-xs sm:text-sm text-gray-600 mt-1">Criar nova streaming</p>
+                <p className="text-sm text-gray-600 mt-1">Criar nova streaming</p>
               </div>
             </div>
           </button>

@@ -87,7 +87,7 @@ router.post('/', authenticateToken, requireLevel(['super_admin', 'admin']), asyn
       nome, email, telefone, senha, streamings, espectadores, bitrate, espaco,
       subrevendas, status_detalhado, data_expiracao, observacoes_admin,
       limite_uploads_diario, espectadores_ilimitado, bitrate_maximo,
-      dominio_padrao, idioma_painel, url_suporte, plano_id, usuario
+      dominio_padrao, idioma_painel, url_suporte, plano_id, usuario, codigo_wowza_servidor
     } = req.body;
 
     // Validar campos obrigatórios
@@ -132,16 +132,20 @@ router.post('/', authenticateToken, requireLevel(['super_admin', 'admin']), asyn
     // Gerar chave API
     const chaveApi = jwt.sign({ id, email }, settings.JWT.SECRET);
 
-    // Obter servidor padrão das configurações
-    const [config] = await pool.execute(
-      'SELECT codigo_wowza_servidor_atual FROM configuracoes WHERE codigo = 1'
-    );
-    const servidorPadrao = config[0]?.codigo_wowza_servidor_atual;
+    // Usar servidor fornecido ou obter servidor padrão das configurações
+    let servidorSelecionado = codigo_wowza_servidor;
+    
+    if (!servidorSelecionado) {
+      const [config] = await pool.execute(
+        'SELECT codigo_wowza_servidor_atual FROM configuracoes WHERE codigo = 1'
+      );
+      servidorSelecionado = config[0]?.codigo_wowza_servidor_atual;
+    }
 
     // Buscar dados do servidor para criar configuração Wowza
     const [serverData] = await pool.execute(
       'SELECT ip FROM wowza_servers WHERE codigo = ? AND status = "ativo"',
-      [servidorPadrao]
+      [servidorSelecionado]
     );
 
     const [result] = await pool.execute(
@@ -158,7 +162,7 @@ router.post('/', authenticateToken, requireLevel(['super_admin', 'admin']), asyn
         idioma_painel, 1, '0.0.0.0', req.admin.codigo,
         data_expiracao || null, status_detalhado, observacoes_admin,
         limite_uploads_diario, espectadores_ilimitado ? 1 : 0, bitrate_maximo,
-        url_suporte, servidorPadrao, plano_id || null
+        url_suporte, servidorSelecionado, plano_id || null
       ]
     );
 
@@ -211,7 +215,7 @@ router.put('/:id', authenticateToken, requireLevel(['super_admin', 'admin']), as
       nome, email, telefone, senha, streamings, espectadores, bitrate, espaco,
       subrevendas, status_detalhado, data_expiracao, observacoes_admin,
       limite_uploads_diario, espectadores_ilimitado, bitrate_maximo,
-      dominio_padrao, idioma_painel, url_suporte, plano_id, usuario
+      dominio_padrao, idioma_painel, url_suporte, plano_id, usuario, codigo_wowza_servidor
     } = req.body;
 
     let updateQuery = `
@@ -227,8 +231,14 @@ router.put('/:id', authenticateToken, requireLevel(['super_admin', 'admin']), as
       usuario, nome, email, telefone, streamings, espectadores, bitrate, espaco,
       subrevendas, status_detalhado, data_expiracao || null, observacoes_admin,
       limite_uploads_diario, espectadores_ilimitado ? 1 : 0, bitrate_maximo,
-      dominio_padrao, idioma_painel, url_suporte, plano_id || null
+        dominio_padrao, idioma_painel, url_suporte, plano_id || null
     ];
+
+    // Adicionar servidor se fornecido
+    if (codigo_wowza_servidor) {
+      updateQuery += ', codigo_wowza_servidor = ?';
+      params.push(codigo_wowza_servidor);
+    }
 
     // Se senha foi fornecida, incluir na atualização
     if (senha && senha.trim() !== '') {
